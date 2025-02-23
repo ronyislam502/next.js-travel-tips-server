@@ -1,17 +1,19 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { Router } from 'express';
 import { UserControllers } from './user.controller';
 import { upload } from '../../utils/sendImageToCloudinary';
+import { parseBody } from '../../middlewares/bodyParse';
 
 const router = Router();
 
 router.post(
   '/create-user',
   upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = JSON.parse(req.body.data);
-    next();
-  },
+  parseBody,
   UserControllers.createUser,
 );
+
+router.get('/', UserControllers.getAllUsers);
+
+router.get('/:email', UserControllers.getSingleUser);
 
 export const UserRoutes = router;

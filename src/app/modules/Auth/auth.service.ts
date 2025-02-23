@@ -10,12 +10,11 @@ import { createToken, verifyToken } from './auth.utils';
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
-  const user = await User.isUserExistsByEmail(payload.email);
+  const user = await User.isUserExistsByEmail(payload?.email);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
-  // checking if the user is already deleted
 
   const isDeleted = user?.isDeleted;
 
@@ -50,7 +49,6 @@ const loginUser = async (payload: TLoginUser) => {
   return {
     accessToken,
     refreshToken,
-    user,
   };
 };
 
@@ -90,6 +88,7 @@ const changePassword = async (
     },
     {
       password: newHashedPassword,
+      needsPasswordChange: false,
       passwordChangedAt: new Date(),
     },
   );
@@ -140,6 +139,7 @@ const refreshToken = async (token: string) => {
 };
 
 const forgetPassword = async (email: string) => {
+  // checking if the user is exist
   const user = await User.isUserExistsByEmail(email);
 
   if (!user) {
@@ -167,7 +167,7 @@ const forgetPassword = async (email: string) => {
 
   sendEmail(user.email, resetUILink);
 
-  // console.log(resetUILink);
+  console.log(resetUILink);
 };
 
 const resetPassword = async (
@@ -194,7 +194,7 @@ const resetPassword = async (
 
   //localhost:3000?id=A-0001&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
 
-  if (payload.email !== decoded.userId) {
+  if (payload.email !== decoded.email) {
     // console.log(payload.email, decoded.userId);
     throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden!');
   }
@@ -207,7 +207,7 @@ const resetPassword = async (
 
   await User.findOneAndUpdate(
     {
-      id: decoded.userId,
+      email: decoded.email,
       role: decoded.role,
     },
     {
