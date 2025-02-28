@@ -18,6 +18,10 @@ const moduleRoutes = [
     path: '/posts',
     route: PostRoutes,
   },
+  {
+    path: '/comments',
+    route: PostRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

@@ -9,5 +9,5 @@ export type TPost = {
   comments?: string[];
   upVotes?: Types.ObjectId[];
   downVotes?: Types.ObjectId[];
-  isDelete: boolean;
+  isDeleted: boolean;
 };

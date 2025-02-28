@@ -29,7 +29,28 @@ const getAllPostsFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
+const updatePostFromDB = async (_id: string, payload: Partial<TPost>) => {
+  const isPostExists = await Post.findById(_id);
+
+  if (isPostExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Post not Found');
+  }
+
+  const isUser = payload?.userId;
+  if (!isUser) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+  }
+
+  const result = await Post.findByIdAndUpdate(_id, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return result;
+};
+
 export const PostServices = {
   createPostIntoDB,
   getAllPostsFromDB,
+  updatePostFromDB,
 };
