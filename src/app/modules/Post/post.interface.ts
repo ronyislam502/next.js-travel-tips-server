@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export type TPost = {
-  user: Types.ObjectId;
+  userId: Types.ObjectId;
   title: string;
   images?: string[];
   category: string;
