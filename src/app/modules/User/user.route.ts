@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { UserControllers } from './user.controller';
-import { upload } from '../../utils/sendImageToCloudinary';
 import { parseBody } from '../../middlewares/bodyParse';
+import { multerUpload } from '../../config/multer.config';
 
 const router = Router();
 
 router.post(
   '/create-user',
-  upload.single('file'),
+  multerUpload.single('file'),
   parseBody,
   UserControllers.createUser,
 );

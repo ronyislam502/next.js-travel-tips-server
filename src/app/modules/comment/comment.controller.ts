@@ -40,8 +40,21 @@ const updateComment = catchAsync(async (req, res) => {
   });
 });
 
+const deleteCommentByPost = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CommentServices.deleteCommentByPostFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Post by comment delete successfully',
+    data: result,
+  });
+});
+
 export const CommentControllers = {
   createComment,
   updateComment,
   getAllCommentsByPost,
+  deleteCommentByPost,
 };

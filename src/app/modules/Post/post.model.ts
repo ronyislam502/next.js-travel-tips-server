@@ -1,54 +1,54 @@
 import { model, Schema } from 'mongoose';
 import { TPost } from './post.interface';
 
-const postSchema = new Schema<TPost>(
-  {
-    userId: {
+const postSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  images: [{ type: String }],
+  category: {
+    type: String,
+    required: true,
+  },
+  tags: {
+    type: String,
+    enum: {
+      values: ['premium', 'everyone'],
+    },
+    required: true,
+  },
+  comments: [
+    {
       type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    images: {
-      type: [String],
+      ref: 'Comment',
       default: [],
     },
-    category: {
-      type: String,
-      required: true,
-    },
-    upVotes: {
+  ],
+  upVotes: [
+    {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: [],
     },
-    downVotes: {
+  ],
+  downVotes: [
+    {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: [],
     },
-
-    comments: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    tags: {
-      type: String,
-      enum: {
-        values: ['premium', 'everyone'],
-      },
-      default: 'everyone',
-    },
-    isDelete: {
-      type: Boolean,
-      default: false,
-    },
+  ],
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
-  {
-    timestamps: true,
-  },
-);
+});
 
 postSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });

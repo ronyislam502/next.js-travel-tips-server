@@ -53,12 +53,14 @@ const userSchema = new Schema<TUser, UserModel>(
       {
         type: Schema.Types.ObjectId,
         ref: 'User',
+        required: false,
       },
     ],
     followers: [
       {
         type: Schema.Types.ObjectId,
         ref: 'User',
+        required: false,
       },
     ],
     isDeleted: {

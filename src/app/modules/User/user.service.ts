@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
 
 import QueryBuilder from '../../builder/QueryBuilder';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { TImageFile } from '../../interface/image';
 import { userSearchableFields } from './user.constant';
 
 import { TUser } from './user.interface';
 import { User } from './user.model';
 
-const createUserIntoDB = async (file: any, payload: TUser) => {
-  if (file) {
-    const imageName = `${payload?.name}`;
-    const path = file?.path;
-    const img_url = await sendImageToCloudinary(imageName, path);
-    payload.profileImg = img_url as string;
-  }
+const createUserIntoDB = async (image: TImageFile, payload: TUser) => {
+  const file = image;
+  payload.profileImg = file?.path;
+
+  // payload.profileImg = file?.path;
+
   const result = await User.create(payload);
 
   return result;

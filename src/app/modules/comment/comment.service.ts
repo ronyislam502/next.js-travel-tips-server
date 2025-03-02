@@ -8,7 +8,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 const createCommentIntoDB = async (payload: TComment) => {
   const isPost = await Post.findById(payload.postId);
 
-  if (isPost) {
+  if (!isPost) {
     throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
   }
 
@@ -27,13 +27,16 @@ const getAllCommentsByPostFromDB = async (
   payload: TComment,
   query: Record<string, unknown>,
 ) => {
-  const isPostExists = await Comment.findById(payload.postId);
+  // const isPostExists = await Post.findById(payload.postId);
 
-  if (!isPostExists) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
-  }
+  // console.log('post', isPostExists);
+
+  // if (!isPostExists) {
+  //   throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
+  // }
+
   const commentQuery = new QueryBuilder(
-    Comment.find().populate('post').populate('user'),
+    Comment.find().populate('postId').populate('userId'),
     query,
   ).sort();
 
@@ -70,8 +73,27 @@ const updateCommentByPostIntoDB = async (
   return result;
 };
 
+const deleteCommentByPostFromDB = async (id: string) => {
+  const isCommentExists = await Comment.findById(id);
+
+  if (!isCommentExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
+  }
+  const isUser = isCommentExists.userId;
+  if (!isUser) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+  }
+  const result = await Comment.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true },
+  );
+  return result;
+};
+
 export const CommentServices = {
   createCommentIntoDB,
   getAllCommentsByPostFromDB,
   updateCommentByPostIntoDB,
+  deleteCommentByPostFromDB,
 };

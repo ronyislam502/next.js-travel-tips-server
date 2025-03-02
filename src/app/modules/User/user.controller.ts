@@ -3,8 +3,16 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 
+import { TImageFile } from '../../interface/image';
+
 const createUser = catchAsync(async (req, res) => {
-  const result = await UserServices.createUserIntoDB(req.file, req.body);
+  // if (req.file) {
+  //   throw new AppError(httpStatus.NOT_FOUND, 'please upload image file');
+  // }
+  const result = await UserServices.createUserIntoDB(
+    req.file as TImageFile,
+    req.body,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

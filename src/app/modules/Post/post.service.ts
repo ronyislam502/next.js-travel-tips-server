@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { User } from '../User/user.model';
@@ -5,8 +6,12 @@ import { TPost } from './post.interface';
 import { Post } from './post.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { postSearch } from './post.constant';
+import { TImageFiles } from '../../interface/image';
 
-const createPostIntoDB = async (payload: TPost) => {
+const createPostIntoDB = async (images: TImageFiles, payload: TPost) => {
+  const { files } = images;
+  payload.images = files.map((file) => file.path);
+
   const user = await User.findById(payload.userId);
 
   if (!user) {
@@ -32,11 +37,12 @@ const getAllPostsFromDB = async (query: Record<string, unknown>) => {
 const updatePostFromDB = async (_id: string, payload: Partial<TPost>) => {
   const isPostExists = await Post.findById(_id);
 
-  if (isPostExists) {
+  if (!isPostExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'Post not Found');
   }
 
   const isUser = payload?.userId;
+
   if (!isUser) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
   }
@@ -49,8 +55,31 @@ const updatePostFromDB = async (_id: string, payload: Partial<TPost>) => {
   return result;
 };
 
+const postDeleteFromDB = async (_id: string, payload: TPost) => {
+  const isPostExists = await Post.findById(_id);
+
+  if (!isPostExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Post not Found');
+  }
+
+  const isUser = payload?.userId;
+
+  if (!isUser) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'unAuthorized access');
+  }
+
+  const result = await Post.findByIdAndUpdate(
+    _id,
+    { isDeleted: true },
+    { new: true },
+  );
+
+  return result;
+};
+
 export const PostServices = {
   createPostIntoDB,
   getAllPostsFromDB,
   updatePostFromDB,
+  postDeleteFromDB,
 };
